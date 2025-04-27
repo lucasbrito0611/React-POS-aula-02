@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useState } from "react";
 
 const Titulo = () => <h1 className="text-4xl font-bold mb-3">React - Conceitos Básicos</h1>
 
@@ -13,38 +14,75 @@ const Cabecalho = () => (
   </div>
 )
 
+// src/app/page.tsx 
+
+interface TarefaInterface {
+	id: number;
+	title: string;
+	completed: boolean;
+}
+
 interface TarefaProps {
-  titulo: string;
-	concluido?: boolean;
+	titulo: string,
+	concluido?: boolean
 }
 
-class Tarefa extends React.Component<TarefaProps> {
-	render(): React.ReactNode {
-		const classe = `p-3 mb-3 rounded-lg shadow-md ${this.props.concluido ? "bg-gray-800" : "bg-gray-400"}`;
+interface TarefasProps {
+	dados: Array<TarefaInterface>;
+}
 
-		return (
-			<div className={classe}>
-				<h3 className="text-xl font-bold">{this.props.titulo}</h3>
-				<p className="text-sm">{this.props.concluido ? "Concluída" : "Pendente"}</p>
-			</div>
-		);
+const Tarefa: React.FC<TarefaProps> = ({ titulo, concluido }) => {
+	const [estaConcluido, setEstaConcluido] = useState(concluido);
+
+	const classe = `p-3 mb-3 rounded-lg shadow-md hover:cursor-pointer hover:border ${
+		estaConcluido
+			? "bg-gray-800 hover:border-gray-800"
+			: "bg-gray-400 hover:border-gray-400"
+	}`;
+
+	const escutarClique = () => {
+		console.log(`A tarefa '${titulo}' foi clicada!`);
+		setEstaConcluido(!estaConcluido);
 	}
-}
+
+	return (
+		<div
+			className={classe}
+			onClick={() => escutarClique()}
+		>
+			<h3 className="text-xl font-bold">{titulo}</h3>
+			<p className="text-sm">{estaConcluido ? "Concluída" : "Pendente"}</p>
+		</div>
+	);
+};
+
+const Tarefas: React.FC<TarefasProps> = ({ dados }) => {
+	return (
+		<div>
+			{dados.map((tarefa) => (
+				<Tarefa
+					key={tarefa.id}
+					titulo={tarefa.title}
+					concluido={tarefa.completed}
+				/>
+			))}
+		</div>
+	);
+};
 
 const Home = () => {
-  const tarefas = [
+	const tarefas = [
 		{ id: 1, title: "delectus aut autem", completed: false },
 		{ id: 2, title: "quis ut nam facilis et officia qui", completed: true },
 		{ id: 3, title: "fugiat veniam minus", completed: false },
 	];
 
-  return (
-    <div className="container mx-auto p-4">
-      <Cabecalho />
-      <Tarefa titulo={tarefas[0].title} concluido={tarefas[0].completed} />
-			<Tarefa titulo={tarefas[1].title} concluido={tarefas[1].completed} />
-    </div>
-  )
-}
+	return (
+		<div className="container mx-auto p-4">
+			<Cabecalho />
+			<Tarefas dados={tarefas} />
+		</div>
+	);
+};
 
 export default Home;
